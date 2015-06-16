@@ -1,0 +1,12 @@
+{
+  "name": "testcafe-phoenix-webhooks",
+  "version": "0.0.1",
+  "dependencies": {
+    "babel-runtime": "5.4.7",
+    "express": "*",
+    "github": "*",
+    "gulp": "*",
+    "gulp-babel": "^5.1.0",
+    "gulp-sourcemaps": "^1.5.2"
+  }
+}
