@@ -9,6 +9,7 @@ function makePromise (context, fn, args) {
                 reject(err);
             }
             else {
+                console.log(res);
                 resolve(res);
             }
         }));
