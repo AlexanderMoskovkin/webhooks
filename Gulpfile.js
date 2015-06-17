@@ -31,9 +31,9 @@ gulp.task('ES6', function () {
             includeContent: true,
             sourceRoot: '../src'
         }))
-        .pipe(gulp.dest('./lib'));
+        .pipe(gulp.dest('./_lib'));
 });
 
 gulp.task('app', ['ES6'], function () {
-    var app = require('./lib/app.js');
+    var app = require('./_lib/app.js');
 });

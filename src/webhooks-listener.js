@@ -1,4 +1,4 @@
-import * as pullRequestHandler from './webhooks-handler.js';
+import * as pullRequestHandler from './pull-request-handler';
 import EventEmitter from './event-emitter.js';
 import GITHUB_MESSAGE_TYPES from './github-message-types';
 
