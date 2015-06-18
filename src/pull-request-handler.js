@@ -32,9 +32,11 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
                     if (statusBody.sha !== pullRequestSha)
                         return;
 
-                    if (statusBody.state === 'pending' && !testsStarted) {
-                        testsStarted = true;
-                        github.createPullRequestComment(prNumber, 'tests started: ' + statusBody.target_url);
+                    if (statusBody.state === 'pending') {
+                        if (!!testsStarted) {
+                            testsStarted = true;
+                            github.createPullRequestComment(prNumber, 'tests started: ' + statusBody.target_url);
+                        }
                         return;
                     }
 
