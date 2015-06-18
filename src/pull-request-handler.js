@@ -12,6 +12,9 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
         if (/temp-pr/.test(prBody.pull_request.base.ref))
             return;
 
+        if (!/opened/.test(prBody.action))
+            return;
+
         var pullRequestSha = prBody.pull_request.head.sha;
         var prId           = prBody.pull_request.id;
         var prNumber       = prBody.number;
