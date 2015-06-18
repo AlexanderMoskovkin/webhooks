@@ -3,47 +3,23 @@ import WebHooksListener from './webhooks-listener';
 import GITHUB_MESSAGE_TYPES from './github-message-types';
 
 //returns sha of the tested commit
-async function _onPullRequest (github, baseCommitSha, prHeadLabel, prId, prNumber) {
-    var ctx = {
-        baseCommitSha: baseCommitSha,
-        prHeadLabel:   prHeadLabel,
-        prId:          prId,
-        prNumber:      prNumber,
-
-        testBranchName:  'rp-' + prId,
-        testedCommitSha: null,
-        _tempBranchName: 'temp-pr-' + prId
-    };
-
-    return github.createBranch(ctx.baseCommitSha, ctx._tempBranchName)
-        .then(function () {
-            return github.createPullRequest(ctx.prId, ctx._tempBranchName, ctx.prHeadLabel);
-        })
-        .then(function (tempPrNumber) {
-            return github.mergePullRequest(ctx.baseCommitSha, tempPrNumber, 'Merge pr to run tests');
-        })
-        .then(function (prCommitSha) {
-            return github.createBranch(prCommitSha, ctx.testBranchName);
-        })
+async function _onPullRequest (github, prId, prNumber, pullRequestSha, testBranchName) {
+    return github.createBranch(pullRequestSha, testBranchName)
         .then(function (res) {
-            ctx.testedCommitSha = res.branchSha;
-            return github.deleteBranch(ctx._tempBranchName);
+            return github.createPullRequestComment(prNumber, 'tests started');
         })
         .then(function () {
-            return github.createPullRequestComment(ctx.prNumber, 'tests started');
-        })
-        .then(function () {
-            return new Promise(resolve => resolve(ctx));
+            return new Promise(resolve => resolve());
         })
         .catch(function (err) {
             throw new Error(err);
         });
 }
 
-async function _onTestsFinished (github, ctx, status, reportUrl) {
-    return github.createPullRequestComment(ctx.prNumber, status + ': ' + reportUrl)
+async function _onTestsFinished (github, prNumber, testBranchName, status, reportUrl) {
+    return github.createPullRequestComment(prNumber, status + ': ' + reportUrl)
         .then(function () {
-            github.deleteBranch(ctx.testBranchName);
+            github.deleteBranch(testBranchName);
         });
 }
 
@@ -57,20 +33,20 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
         if (/temp-pr/.test(prBody.pull_request.base.ref))
             return;
 
-        var baseCommitSha = prBody.pull_request.base.sha;
-        var prHeadLabel   = prBody.pull_request.head.label;
-        var prId          = prBody.pull_request.id;
-        var prNumber      = prBody.number;
+        var pullRequestSha = prBody.pull_request.head.sha;
+        var prId           = prBody.pull_request.id;
+        var prNumber       = prBody.number;
+        var testBranchName = 'rp-' + prId;
 
-        _onPullRequest(github, baseCommitSha, prHeadLabel, prId, prNumber)
-            .then(function (prCtx) {
+        _onPullRequest(github, prId, prNumber, pullRequestSha, testBranchName)
+            .then(function () {
                 function onStatusMessage (e) {
                     var statusBody = e.body;
 
-                    if (!/continuous-integration\/travis-ci\//.test(context))
+                    if (!/continuous-integration\/travis-ci\//.test(statusBody.context))
                         return;
 
-                    if (statusBody.sha !== testedCommitSha)
+                    if (statusBody.sha !== pullRequestSha)
                         return;
 
                     if (statusBody.state === 'pending')
@@ -78,7 +54,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
 
                     webhooksListener.off(GITHUB_MESSAGE_TYPES.STATUS, onStatusMessage);
 
-                    _onTestsFinished(github, prCtx, statusBody.state, statusBody.target_url);
+                    _onTestsFinished(github, prNumber, testBranchName, statusBody.state, statusBody.target_url);
                 }
 
                 webhooksListener.on(GITHUB_MESSAGE_TYPES.STATUS, onStatusMessage);
