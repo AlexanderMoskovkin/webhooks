@@ -9,7 +9,6 @@ function makePromise (context, fn, args) {
                 reject(err);
             }
             else {
-                console.log(res);
                 resolve(res);
             }
         }));
@@ -38,6 +37,7 @@ export default class GitHub {
 
     //returns new branch name and branch commit sha
     async createBranch (baseSha, branchName) {
+        console.log('createBranch', baseSha, branchName);
         var refName = 'refs/heads/' + branchName;
 
         var msg = {
@@ -57,6 +57,7 @@ export default class GitHub {
     }
 
     async deleteBranch (branchName) {
+        console.log('deleteBranch', branchName);
         var refName = 'heads/' + branchName;
 
         var msg = {
@@ -73,6 +74,8 @@ export default class GitHub {
 
     //returns new pull request number
     async createPullRequest (title, base, head) {
+        console.log('createPullRequest', title, base, head);
+
         var msg = {
             user:  this.user,
             repo:  this.repo,
@@ -89,6 +92,8 @@ export default class GitHub {
 
     //returns the last commit sha
     async mergePullRequest (commitSha, prNumber, message) {
+        console.log('mergePullRequest', commitSha, prNumber, message);
+
         var msg = {
             user:           this.user,
             repo:           this.repo,
@@ -104,6 +109,8 @@ export default class GitHub {
     }
 
     async createPullRequestComment (prNumber, comment) {
+        console.log('createPullRequestComment', prNumber, comment);
+
         var msg = {
             user:   this.user,
             repo:   this.repo,

@@ -52,7 +52,11 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
     var github = new GitHub(githubUser, githubRepo, githubOauthToken);
 
     webhooksListener.on(GITHUB_MESSAGE_TYPES.PULL_REQUEST, function (e) {
-        var prBody        = e.body;
+        var prBody = e.body;
+
+        if (/temp-pr/.test(prBody.pull_request.base.ref))
+            return;
+
         var baseCommitSha = prBody.pull_request.base.sha;
         var prHeadLabel   = prBody.pull_request.head.label;
         var prId          = prBody.pull_request.id;

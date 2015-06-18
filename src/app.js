@@ -5,7 +5,7 @@ import * as pullRequestHandler from './pull-request-handler';
 
 var GITHUB_USER = 'AlexanderMoskovkin';
 var GITHUB_REPO = 'testcafe-phoenix';
-var OAUTH_TOKEN = '7a8f2014658c3560c6765830e13153c3a307c3dc';
+var OAUTH_TOKEN = '?????';
 
 var webhooksListener = new WebHooksListener();
 pullRequestHandler.init(GITHUB_USER, GITHUB_REPO, OAUTH_TOKEN, webhooksListener);
