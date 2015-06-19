@@ -43,10 +43,20 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
                     webhooksListener.off(GITHUB_MESSAGE_TYPES.STATUS, onStatusMessage);
 
                     github.createPullRequestComment(prNumber, 'Tests ' + statusBody.state);
-                    github.deleteBranch(testBranchName);
                 }
 
                 webhooksListener.on(GITHUB_MESSAGE_TYPES.STATUS, onStatusMessage);
+
+                function onPullRequestClosed (e) {
+                    if (e.body.pull_request.id !== prId || e.body.action !== 'closed')
+                        return;
+
+                    github.deleteBranch(testBranchName);
+
+                    webhooksListener.off(GITHUB_MESSAGE_TYPES.PULL_REQUEST, onPullRequestClosed);
+                }
+
+                webhooksListener.on(GITHUB_MESSAGE_TYPES.PULL_REQUEST, onPullRequestClosed);
             });
     });
 }
