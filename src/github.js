@@ -123,4 +123,17 @@ export default class GitHub {
                 return new Promise(resolve => resolve(res));
             });
     }
+
+    async syncBranchWithCommit (branchName, commitSha) {
+        console.log('syncBranchWithCommit', branchName, commitSha);
+
+        var msg = {
+            user: this.user,
+            repo: this.repo,
+            ref:  'heads/' + branchName,
+            sha:  commitSha
+        };
+
+        return makePromise(this.github.gitdata, this.github.gitdata.updateReference, [msg]);
+    }
 }

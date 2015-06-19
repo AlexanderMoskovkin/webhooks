@@ -37,3 +37,7 @@ gulp.task('ES6', function () {
 gulp.task('app', ['ES6'], function () {
     var app = require('./_lib/app.js');
 });
+
+gulp.task('test', ['ES6'], function () {
+    var app = require('./_lib/test.js');
+});
