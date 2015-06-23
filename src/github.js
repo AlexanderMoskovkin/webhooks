@@ -120,6 +120,22 @@ export default class GitHub {
 
         return makePromise(this.github.issues, this.github.issues.createComment, [msg])
             .then(function (res) {
+                return new Promise(resolve => resolve(res.id));
+            });
+    }
+
+    async editComment (id, comment) {
+        console.log('editComment', id, comment);
+
+        var msg = {
+            user: this.user,
+            repo: this.repo,
+            id:   id,
+            body: comment
+        };
+
+        return makePromise(this.github.issues, this.github.issues.editComment, [msg])
+            .then(function (res) {
                 return new Promise(resolve => resolve(res));
             });
     }

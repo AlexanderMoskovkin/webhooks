@@ -2,7 +2,7 @@ import GitHub from './github';
 import WebHooksListener from './webhooks-listener';
 import GITHUB_MESSAGE_TYPES from './github-message-types';
 
-var RUN_TESTS_ON_PULL_REQUEST_SYNCHRONIZE_TIMEOUT = 2 * 60 * 1000;
+var RUN_TESTS_ON_PULL_REQUEST_SYNCHRONIZE_TIMEOUT = 5 * 60 * 1000;
 
 //API
 export function init (githubUser, githubRepo, githubOauthToken, webhooksListener) {
@@ -25,6 +25,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
         var testsStarted   = false;
 
         var mergeCommitWithTestBranchTimeout = null;
+        var testCommentId = null;
 
         function onTestsStarted (commitSha) {
             function onStatusMessage (e) {
@@ -40,7 +41,10 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
                     if (!runningTests[commitSha]) {
                         runningTests[commitSha] = true;
                         github.createPullRequestComment(prNumber, 'tests for commit ' + commitSha + ' started: ' +
-                                                                  statusBody.target_url);
+                                                                  statusBody.target_url)
+                            .then(function (commentId) {
+                                testCommentId = commentId;
+                            });
                     }
                     return;
                 }
@@ -48,7 +52,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
                 webhooksListener.off(GITHUB_MESSAGE_TYPES.STATUS, onStatusMessage);
 
                 runningTests[pullRequestSha] = null;
-                github.createPullRequestComment(prNumber, 'tests for commit ' + commitSha + ' ' + statusBody.state +
+                github.editComment(testCommentId, 'tests for commit ' + commitSha + ' ' + statusBody.state +
                                                           ': ' + statusBody.target_url);
             }
 
