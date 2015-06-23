@@ -52,8 +52,8 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
                 webhooksListener.off(GITHUB_MESSAGE_TYPES.STATUS, onStatusMessage);
 
                 runningTests[pullRequestSha] = null;
-                github.editComment(testCommentId, 'tests for commit ' + commitSha + ' ' + statusBody.state +
-                                                          ': ' + statusBody.target_url);
+                github.editComment(testCommentId, 'tests for commit ' + commitSha + ' **' + statusBody.state +
+                                                          '**: ' + statusBody.target_url);
             }
 
             webhooksListener.on(GITHUB_MESSAGE_TYPES.STATUS, onStatusMessage);
