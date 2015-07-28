@@ -1,6 +1,7 @@
 import GitHub from './github';
 import WebHooksListener from './webhooks-listener';
 import GITHUB_MESSAGE_TYPES from './github-message-types';
+import log from './log';
 
 var RUN_TESTS_ON_PULL_REQUEST_SYNCHRONIZE_TIMEOUT = 5 * 60 * 1000;
 
@@ -10,6 +11,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
 
     webhooksListener.on(GITHUB_MESSAGE_TYPES.PULL_REQUEST, function (e) {
         var prBody = e.body;
+        log('Pull request message: ' + prBody);
 
         if (/temp-pr/.test(prBody.pull_request.base.ref))
             return;
@@ -25,11 +27,12 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
         var testsStarted   = false;
 
         var mergeCommitWithTestBranchTimeout = null;
-        var testCommentId = null;
+        var testCommentId                    = null;
 
         function onTestsStarted (commitSha) {
             function onStatusMessage (e) {
                 var statusBody = e.body;
+                log('Status message: ' + e.body);
 
                 if (!/continuous-integration\/travis-ci\//.test(statusBody.context))
                     return;
@@ -53,7 +56,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
 
                 runningTests[pullRequestSha] = null;
                 github.editComment(testCommentId, 'tests for commit ' + commitSha + ' **' + statusBody.state +
-                                                          '**: ' + statusBody.target_url);
+                                                  '**: ' + statusBody.target_url);
             }
 
             webhooksListener.on(GITHUB_MESSAGE_TYPES.STATUS, onStatusMessage);
@@ -64,6 +67,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
                 onTestsStarted(pullRequestSha);
 
                 function onPullRequestEvents (e) {
+                    log('Pull request message: ' + e.body);
                     if (e.body.pull_request.id !== prId)
                         return;
 

@@ -1,10 +1,11 @@
 import NodeGitHub from 'github';
+import log from './log';
 
 function makePromise (context, fn, args) {
     return new Promise(function (resolve, reject) {
         fn.apply(context, args.concat(function (err, res) {
             if (err) {
-                console.log('ERROR:', err);
+                log('ERROR:', err);
                 throw new Error(err);
                 reject(err);
             }
@@ -37,7 +38,7 @@ export default class GitHub {
 
     //returns new branch name and branch commit sha
     async createBranch (baseSha, branchName) {
-        console.log('createBranch', baseSha, branchName);
+        log('createBranch', baseSha, branchName);
         var refName = 'refs/heads/' + branchName;
 
         var msg = {
@@ -57,7 +58,7 @@ export default class GitHub {
     }
 
     async deleteBranch (branchName) {
-        console.log('deleteBranch', branchName);
+        log('deleteBranch', branchName);
         var refName = 'heads/' + branchName;
 
         var msg = {
@@ -74,7 +75,7 @@ export default class GitHub {
 
     //returns new pull request number
     async createPullRequest (title, base, head) {
-        console.log('createPullRequest', title, base, head);
+        log('createPullRequest', title, base, head);
 
         var msg = {
             user:  this.user,
@@ -92,7 +93,7 @@ export default class GitHub {
 
     //returns the last commit sha
     async mergePullRequest (commitSha, prNumber, message) {
-        console.log('mergePullRequest', commitSha, prNumber, message);
+        log('mergePullRequest', commitSha, prNumber, message);
 
         var msg = {
             user:           this.user,
@@ -109,7 +110,7 @@ export default class GitHub {
     }
 
     async createPullRequestComment (prNumber, comment) {
-        console.log('createPullRequestComment', prNumber, comment);
+        log('createPullRequestComment', prNumber, comment);
 
         var msg = {
             user:   this.user,
@@ -125,7 +126,7 @@ export default class GitHub {
     }
 
     async editComment (id, comment) {
-        console.log('editComment', id, comment);
+        log('editComment', id, comment);
 
         var msg = {
             user: this.user,
@@ -141,7 +142,7 @@ export default class GitHub {
     }
 
     async syncBranchWithCommit (branchName, commitSha) {
-        console.log('syncBranchWithCommit', branchName, commitSha);
+        log('syncBranchWithCommit', branchName, commitSha);
 
         var msg = {
             user: this.user,
