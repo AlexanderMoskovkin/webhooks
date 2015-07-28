@@ -11,7 +11,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
 
     webhooksListener.on(GITHUB_MESSAGE_TYPES.PULL_REQUEST, function (e) {
         var prBody = e.body;
-        log('Pull request message: ' + prBody);
+        log('Pull request message: ' + JSON.stringify(prBody, null, 4));
 
         if (/temp-pr/.test(prBody.pull_request.base.ref))
             return;
@@ -32,7 +32,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
         function onTestsStarted (commitSha) {
             function onStatusMessage (e) {
                 var statusBody = e.body;
-                log('Status message: ' + e.body);
+                log('Status message: ' + JSON.stringify(e.body, null, 4));
 
                 if (!/continuous-integration\/travis-ci\//.test(statusBody.context))
                     return;
@@ -67,7 +67,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
                 onTestsStarted(pullRequestSha);
 
                 function onPullRequestEvents (e) {
-                    log('Pull request message: ' + e.body);
+                    log('Pull request message: ' + JSON.stringify(e.body, null, 4));
                     if (e.body.pull_request.id !== prId)
                         return;
 
