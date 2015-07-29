@@ -5,8 +5,7 @@ function makePromise (context, fn, args) {
     return new Promise(function (resolve, reject) {
         fn.apply(context, args.concat(function (err, res) {
             if (err) {
-                log('ERROR:', err);
-                throw new Error(err);
+                log('ERROR:', JSON.stringify(err, null, 4));
                 reject(err);
             }
             else {

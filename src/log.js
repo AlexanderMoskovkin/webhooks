@@ -5,5 +5,5 @@ var LOG_PATH = path.join(__dirname, '../log.txt');
 
 export default function (msg) {
     console.log(msg);
-    fs.writeFileSync(LOG_PATH, new Date().toLocaleString() + ': ' + msg + '\r\n', 'utf-8');
+    fs.appendFileSync(LOG_PATH, new Date().toLocaleString() + ': ' + msg + '\r\n', 'utf-8');
 }
