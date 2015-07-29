@@ -147,7 +147,8 @@ export default class GitHub {
             user: this.user,
             repo: this.repo,
             ref:  'heads/' + branchName,
-            sha:  commitSha
+            sha:  commitSha,
+            force: true
         };
 
         return makePromise(this.github.gitdata, this.github.gitdata.updateReference, [msg]);
