@@ -5,7 +5,7 @@ function makePromise (context, fn, args) {
     return new Promise(function (resolve, reject) {
         fn.apply(context, args.concat(function (err, res) {
             if (err) {
-                log('ERROR:', JSON.stringify(err, null, 4));
+                log('ERROR:' + JSON.stringify(err, null, 4));
                 reject(err);
             }
             else {
@@ -108,12 +108,12 @@ export default class GitHub {
             });
     }
 
-    async createPullRequestComment (prNumber, comment) {
+    async createPullRequestComment (prNumber, comment, owner, repo) {
         log('createPullRequestComment', prNumber, comment);
 
         var msg = {
-            user:   this.user,
-            repo:   this.repo,
+            user:   owner || this.user,
+            repo:   repo || this.repo,
             number: prNumber,
             body:   comment
         };
@@ -124,12 +124,12 @@ export default class GitHub {
             });
     }
 
-    async editComment (id, comment) {
+    async editComment (id, comment, owner, repo) {
         log('editComment', id, comment);
 
         var msg = {
-            user: this.user,
-            repo: this.repo,
+            user: owner || this.user,
+            repo: repo || this.repo,
             id:   id,
             body: comment
         };
@@ -144,10 +144,10 @@ export default class GitHub {
         log('syncBranchWithCommit', branchName, commitSha);
 
         var msg = {
-            user: this.user,
-            repo: this.repo,
-            ref:  'heads/' + branchName,
-            sha:  commitSha,
+            user:  this.user,
+            repo:  this.repo,
+            ref:   'heads/' + branchName,
+            sha:   commitSha,
             force: true
         };
 

@@ -19,6 +19,8 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
         if (!/opened/.test(prBody.action))
             return;
 
+        var owner          = prBody.repository.owner.login;
+        var repo           = prBody.repository.name;
         var pullRequestSha = prBody.pull_request.head.sha;
         var prId           = prBody.pull_request.id;
         var prNumber       = prBody.number;
@@ -44,7 +46,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
                     if (!runningTests[commitSha]) {
                         runningTests[commitSha] = true;
                         github.createPullRequestComment(prNumber, 'tests for commit ' + commitSha + ' started: ' +
-                                                                  statusBody.target_url)
+                                                                  statusBody.target_url, owner, repo)
                             .then(function (commentId) {
                                 testCommentId = commentId;
                             });
@@ -56,7 +58,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
 
                 runningTests[pullRequestSha] = null;
                 github.editComment(testCommentId, 'tests for commit ' + commitSha + ' **' + statusBody.state +
-                                                  '**: ' + statusBody.target_url);
+                                                  '**: ' + statusBody.target_url, owner, repo);
             }
 
             webhooksListener.on(GITHUB_MESSAGE_TYPES.STATUS, onStatusMessage);
