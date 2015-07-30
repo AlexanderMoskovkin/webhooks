@@ -140,6 +140,18 @@ export default class GitHub {
             });
     }
 
+    async deleteComment (id, owner, repo) {
+        log('deleteComment', id);
+
+        var msg = {
+            user: owner || this.user,
+            repo: repo || this.repo,
+            id:   id
+        };
+
+        return makePromise(this.github.issues, this.github.issues.deleteComment, [msg]);
+    }
+
     async syncBranchWithCommit (branchName, commitSha) {
         log('syncBranchWithCommit', branchName, commitSha);
 

@@ -45,20 +45,28 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
                 if (statusBody.state === 'pending') {
                     if (!runningTests[commitSha]) {
                         runningTests[commitSha] = true;
-                        github.createPullRequestComment(prNumber, 'tests for commit ' + commitSha + ' started: ' +
-                                                                  statusBody.target_url, owner, repo)
-                            .then(function (commentId) {
-                                testCommentId = commentId;
-                            });
+                        github.createPullRequestComment(prNumber,
+                            `Tests for the commit ${commitSha} have started. See [details](${statusBody.target_url}).`,
+                            owner, repo)
+                            .then(commentId => testCommentId = commentId);
                     }
                     return;
                 }
 
                 webhooksListener.off(GITHUB_MESSAGE_TYPES.STATUS, onStatusMessage);
 
+                var success = statusBody.state === 'success';
+                var status  = success ? 'passed' : 'failed';
+                var emoji   = success ? ':white_check_mark:' : ':x:';
+
                 runningTests[pullRequestSha] = null;
-                github.editComment(testCommentId, 'tests for commit ' + commitSha + ' **' + statusBody.state +
-                                                  '**: ' + statusBody.target_url, owner, repo);
+
+                github.deleteComment(testCommentId, owner, repo);
+                github.createPullRequestComment(prNumber,
+                    `${emoji} Tests for the commit ${commitSha} have ${status}. See [details](statusBody.target_url).`,
+                    owner, repo)
+                    .then(commentId => testCommentId = commentId);
+
             }
 
             webhooksListener.on(GITHUB_MESSAGE_TYPES.STATUS, onStatusMessage);
