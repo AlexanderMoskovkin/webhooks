@@ -63,7 +63,7 @@ export function init (githubUser, githubRepo, githubOauthToken, webhooksListener
 
                 github.deleteComment(testCommentId, owner, repo);
                 github.createPullRequestComment(prNumber,
-                    `${emoji} Tests for the commit ${commitSha} have ${status}. See [details](statusBody.target_url).`,
+                    `${emoji} Tests for the commit ${commitSha} have ${status}. See [details](${statusBody.target_url}).`,
                     owner, repo)
                     .then(commentId => testCommentId = commentId);
 
